@@ -12,7 +12,7 @@ whisper_model = whisper.load_model("large")  # 使用 large 模型，自動語�
 # 加載 Pyannote 預訓練模型
 pipeline = Pipeline.from_pretrained(
     "pyannote/speaker-diarization-3.1",
-    use_auth_token="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"
+    use_auth_token="your_api_token"
 )
 
 # 檢查是否有可用的 GPU
