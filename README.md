@@ -20,3 +20,6 @@ You can install the necessary Python packages via `pip`:
 
 ```bash
 pip install torch torchaudio whisper pyannote.audio
+
+## License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
