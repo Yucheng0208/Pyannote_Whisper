@@ -9,7 +9,6 @@ This project is a Python-based tool that integrates Whisper for transcription an
 - **Integrated Transcription and Speaker Matching**: Combines Whisper transcription segments with Pyannote speaker diarization.
 
 ## Prerequisites
-
 - Python 3.8+
 - [Whisper](https://github.com/openai/whisper)
 - [Pyannote](https://github.com/pyannote/pyannote-audio)
@@ -18,8 +17,9 @@ This project is a Python-based tool that integrates Whisper for transcription an
 
 You can install the necessary Python packages via `pip`:
 
-```bash
-pip install torch torchaudio whisper pyannote.audio
+```pip install torch torchaudio whisper pyannote.audio```
+
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
