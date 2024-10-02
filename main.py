@@ -44,6 +44,31 @@ def convert_to_wav(input_file, output_file):
 # 搜尋指定資料夾中的所有檔案，並確保只處理檔案
 files = [f for f in os.listdir(input_folder) if os.path.isfile(os.path.join(input_folder, f))]
 
+# 偵測語言的函數
+def detect_language_for_segments(input_path, diarization):
+    languages = {}
+
+    for turn, _, speaker in diarization.itertracks(yield_label=True):
+        segment_duration = turn.end - turn.start
+
+        # 取前五秒
+        detect_duration = min(segment_duration, 5.0)
+        start_time = turn.start
+        end_time = start_time + detect_duration
+
+        # 加載音訊的前五秒
+        waveform, sample_rate = torchaudio.load(input_path, frame_offset=int(start_time * sample_rate), num_frames=int(detect_duration * sample_rate))
+
+        # Whisper 偵測語言
+        result = whisper_model.transcribe(input_path, language=None)  # 自動偵測語言
+        detected_language = result['language']
+
+        # 儲存每段對話的語言
+        languages[speaker] = detected_language
+        print(f"Speaker {speaker} is speaking {detected_language}")
+
+    return languages
+
 # 將 Whisper 和 Pyannote 時間段整合
 def match_speaker_to_transcript(transcription_segments, diarization):
     result = []
@@ -112,12 +137,17 @@ for file in files:
         else:
             continue  # 如果轉換失敗，跳過該檔案
 
-    # 使用 Whisper 進行語音轉文字，語言自動偵測
-    result = whisper_model.transcribe(input_path)
-    transcription_segments = result["segments"]
-    
     # 使用 Pyannote 進行說話者分段處理
     diarization = pipeline(input_path)
+    
+    # 使用前五秒偵測語言
+    speaker_languages = detect_language_for_segments(input_path, diarization)
+
+    # 使用 Whisper 進行語音轉文字，並提供語言給每段處理
+    transcription_segments = []
+    for speaker, language in speaker_languages.items():
+        result = whisper_model.transcribe(input_path, language=language)
+        transcription_segments.extend(result["segments"])
     
     # 將 Whisper 和 Pyannote 的結果進行整合
     matched_result = match_speaker_to_transcript(transcription_segments, diarization)
